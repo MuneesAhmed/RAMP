@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Portal - RAMP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <img src="../images/ramp-logo.svg" alt="RAMP" height="40" class="me-2">
+                RAMP - Railway Accommodation Maintenance Portal
+            </a>
+            <div class="d-flex">
+                <span class="nav-link">Rail Helpline: 139</span>
+                <a href="#" class="nav-link ms-3">Support</a>
+                <a href="#" class="nav-link ms-3">Help</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Navigation Menu -->
+    <div class="nav-menu bg-white border-bottom py-2">
+        <div class="container-fluid">
+            <div class="d-flex align-items-center">
+                <a href="/" class="text-decoration-none me-4">
+                    <i class="bi bi-house-door"></i> Home
+                </a>
+                <a href="/track.html" class="text-decoration-none me-4">
+                    <i class="bi bi-search"></i> Track Your Request
+                </a>
+                <a href="/contact.html" class="text-decoration-none me-4">
+                    <i class="bi bi-telephone"></i> Contact Support
+                </a>
+                <a href="/staff" class="text-decoration-none me-4 active">
+                    <i class="bi bi-person-badge"></i> Staff Portal
+                </a>
+                <a href="/guide.html" class="text-decoration-none">
+                    <i class="bi bi-book"></i> User Guide
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow">
+                    <div class="card-body p-5">
+                        <div class="text-center mb-4">
+                            <img src="../images/ramp-logo.svg" alt="RAMP" height="60" class="mb-3">
+                            <h2>Staff Portal</h2>
+                            <p class="text-muted">Please log in to access your dashboard</p>
+                        </div>
+
+                        <form id="loginForm">
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Username</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-person"></i>
+                                    </span>
+                                    <input type="text" class="form-control" id="username" name="username" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="password" class="form-label">Password</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">
+                                        <i class="bi bi-lock"></i>
+                                    </span>
+                                    <input type="password" class="form-control" id="password" name="password" required>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-danger d-none" id="errorAlert"></div>
+
+                            <button type="submit" class="btn btn-primary w-100 mb-3">
+                                <i class="bi bi-box-arrow-in-right"></i> Log In
+                            </button>
+
+                            <div class="text-center">
+                                <a href="#" class="text-decoration-none">Forgot Password?</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="text-center mt-4">
+                    <p class="text-muted">
+                        For access issues, please contact your administrator or call our support at 139
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="mb-0">© 2025 Railway Accommodation Maintenance Portal. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <a href="#" class="text-decoration-none me-3">Terms of Service</a>
+                    <a href="#" class="text-decoration-none me-3">Privacy Policy</a>
+                    <a href="#" class="text-decoration-none">Contact</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Redirect to login.html with return URL
+        window.location.href = '/login.html?return=' + encodeURIComponent(window.location.pathname);
+    </script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<div class="alert alert-{{alertType}}">
+    <h2>📢 Request Status Updated</h2>
+    <p>The status of maintenance request #{{requestId}} has been updated.</p>
+</div>
+
+<table class="details-table">
+    <tr>
+        <th>Request ID</th>
+        <td><strong>#{{requestId}}</strong></td>
+    </tr>
+    <tr>
+        <th>Description</th>
+        <td>{{description}}</td>
+    </tr>
+    <tr>
+        <th>Location</th>
+        <td>{{location}}</td>
+    </tr>
+    <tr>
+        <th>Previous Status</th>
+        <td><span class="status-badge">{{oldStatus}}</span></td>
+    </tr>
+    <tr>
+        <th>New Status</th>
+        <td><span class="status-badge status-{{newStatusClass}}">{{newStatus}}</span></td>
+    </tr>
+    <tr>
+        <th>Updated By</th>
+        <td>{{updatedBy}}</td>
+    </tr>
+    <tr>
+        <th>Update Date</th>
+        <td>{{updateDate}}</td>
+    </tr>
+    {{#if supervisor}}
+    <tr>
+        <th>Supervisor</th>
+        <td>{{supervisor}}</td>
+    </tr>
+    {{/if}}
+    {{#if completionTime}}
+    <tr>
+        <th>Resolution Time</th>
+        <td>{{completionTime}}</td>
+    </tr>
+    {{/if}}
+</table>
+
+{{#if statusComments}}
+<div class="alert alert-info">
+    <strong>💬 Status Comments:</strong><br>
+    {{statusComments}}
+</div>
+{{/if}}
+
+{{#if nextSteps}}
+<div class="alert alert-warning">
+    <strong>🔄 Next Steps:</strong><br>
+    {{nextSteps}}
+</div>
+{{/if}}
+
+<div style="text-align: center; margin: 20px 0;">
+    <a href="{{dashboardUrl}}" class="btn">View Details</a>
+</div>

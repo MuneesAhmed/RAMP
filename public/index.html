@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAMP - Railway Accommodation Maintenance Portal</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">RAMP</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/track.html">Track Request</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login.html">Staff Login</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h2 class="text-center mb-4">Maintenance Request Form</h2>
+
+        <div class="card">
+            <div class="card-body">
+                <form id="requestForm" enctype="multipart/form-data">
+                    <div class="row">
+                        <!-- Location Details -->
+                        <div class="col-md-6">
+                            <h4 class="mb-3">Location Details</h4>
+                            
+                            <div class="mb-3">
+                                <label for="division" class="form-label">Division*</label>
+                                <select class="form-select" id="division" name="division_id" required>
+                                    <option value="">Select Division</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="city" class="form-label">City*</label>
+                                <select class="form-select" id="city" name="city_id" required disabled>
+                                    <option value="">Select City</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="colony" class="form-label">Railway Colony*</label>
+                                <select class="form-select" id="colony" name="colony_id" required disabled>
+                                    <option value="">Select Colony</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="wing" class="form-label">Wing/Block</label>
+                                <input type="text" class="form-control text-uppercase" id="wing" name="wing">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="quarterNumber" class="form-label">Quarter/Flat Number*</label>
+                                <input type="text" class="form-control text-uppercase" id="quarterNumber" name="quarter_number" required>
+                            </div>
+                        </div>
+
+                        <!-- Complaint Details -->
+                        <div class="col-md-6">
+                            <h4 class="mb-3">Complaint Details</h4>
+
+                            <div class="mb-3">
+                                <label for="department" class="form-label">Department Category*</label>
+                                <select class="form-select" id="department" name="department_id" required>
+                                    <option value="">Select Department</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="location" class="form-label">Specific Location*</label>
+                                <input type="text" class="form-control text-uppercase" id="location" name="location" 
+                                       placeholder="e.g., KITCHEN, BATHROOM" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Issue Description*</label>
+                                <textarea class="form-control text-uppercase" id="description" name="description" 
+                                          rows="3" required></textarea>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="image" class="form-label">Upload Image (Optional)</label>
+                                <input type="file" class="form-control" id="image" name="image" 
+                                       accept="image/jpeg,image/png">
+                                <div class="form-text">Max size: 5MB. Formats: JPEG, PNG</div>
+                                <div id="imagePreview" class="mt-2 d-none">
+                                    <img src="" alt="Preview" class="img-thumbnail">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contact Information -->
+                        <div class="col-12 mt-4">
+                            <h4 class="mb-3">Contact Information</h4>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="name" class="form-label">Full Name*</label>
+                                        <input type="text" class="form-control text-uppercase" id="name" name="name" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="designation" class="form-label">Designation*</label>
+                                        <input type="text" class="form-control text-uppercase" id="designation" name="designation" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="mobile" class="form-label">Mobile Number*</label>
+                                        <input type="tel" class="form-control" id="mobile" name="mobile" 
+                                               pattern="[0-9]{10}" maxlength="10" required>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div class="mb-3">
+                                        <label for="employeeId" class="form-label">Employee ID/PF Number*</label>
+                                        <input type="text" class="form-control" id="employeeId" name="employee_id" required>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">Email Address*</label>
+                                        <input type="email" class="form-control" id="email" name="email" required>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg">Submit Request</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Success Modal -->
+        <div class="modal fade" id="successModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-success text-white">
+                        <h5 class="modal-title">Request Submitted Successfully</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="alert alert-success" role="alert">
+                            <h4 class="alert-heading">Thank you!</h4>
+                            <p id="successMessage">Your maintenance request has been submitted successfully.</p>
+                            <hr>
+                            <p class="mb-0">Your Request ID: <strong id="requestId" class="text-primary"></strong></p>
+                            <p class="mt-2"><strong>Important:</strong> Please save this ID for tracking your request.</p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <a href="/track.html" class="btn btn-primary">Track Request</a>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

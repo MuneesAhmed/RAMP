@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - RAMP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="../css/style.css" rel="stylesheet">
+    <link href="../css/admin.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <img src="../images/ramp-logo.svg" alt="RAMP" height="40" class="me-2">
+                RAMP - Admin Dashboard
+            </a>
+            <div class="d-flex align-items-center">
+                <span id="userInfo" class="me-3">
+                    <i class="bi bi-person-circle"></i>
+                    <span id="username"></span>
+                </span>
+                <button id="logoutBtn" class="btn btn-outline-primary">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container-fluid py-4">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2">
+                <div class="list-group">
+                    <a href="#dashboard" class="list-group-item list-group-item-action active" data-section="dashboard">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                    <a href="#users" class="list-group-item list-group-item-action" data-section="users">
+                        <i class="bi bi-people"></i> User Management
+                    </a>
+                    <a href="#departments" class="list-group-item list-group-item-action" data-section="departments">
+                        <i class="bi bi-building"></i> Departments
+                    </a>
+                    <a href="#locations" class="list-group-item list-group-item-action" data-section="locations">
+                        <i class="bi bi-geo-alt"></i> Locations
+                    </a>
+                    <a href="#reports" class="list-group-item list-group-item-action" data-section="reports">
+                        <i class="bi bi-file-earmark-text"></i> Reports
+                    </a>
+                    <a href="#settings" class="list-group-item list-group-item-action" data-section="settings">
+                        <i class="bi bi-gear"></i> Settings
+                    </a>
+                </div>
+            </div>
+
+            <!-- Main Content Area -->
+            <div class="col-md-9 col-lg-10">
+                <div id="contentArea">
+                    <!-- Content will be loaded here -->
+                    <div id="loadingSpinner" class="text-center d-none">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Error Alert Modal -->
+    <div class="modal fade" id="errorModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger">Error</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="errorMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
