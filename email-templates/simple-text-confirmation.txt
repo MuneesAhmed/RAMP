@@ -1,0 +1,40 @@
+🎯 RAMP - Railway Maintenance Portal
+Request Confirmation
+
+Dear {{name}},
+
+  Your maintenance request has been submitted successfully!
+
+Your Request Details:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🆔 Request ID: {{requestId}}
+📍 Location: {{location}}
+🏢 Division: {{divisionName}}
+🌆 City: {{cityName}}
+🔧 Department: {{departmentName}}
+📝 Description: {{description}}
+📅 Submitted: {{submittedDate}}
+⏱️ Expected Completion: {{estimatedCompletion}}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🚀 What Happens Next?
+
+✓ Your request will be assigned to a supervisor within 2-4 hours
+✓ You'll receive email updates when work begins
+✓ We'll notify you of any status changes
+✓ You'll be informed when work is completed
+
+📱 Track Your Request: {{trackingUrl}}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📞 Need Help?
+Email: support@ramp-railway.com
+Phone: 1800-XXX-XXXX
+
+Thank you for using RAMP!
+
+This is an automated message. Please do not reply to this email.
+© 2025 Indian Railways. All rights reserved.

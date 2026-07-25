@@ -1,0 +1,239 @@
+/* Admin Dashboard Specific Styles */
+
+/* Stats Cards */
+.stats-card {
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease;
+    cursor: pointer;
+}
+
+.stats-card:hover {
+    transform: translateY(-5px);
+}
+
+.stats-card .card-title {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.stats-card .card-text {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 0;
+    color: #fff;
+}
+
+/* Charts */
+.chart-container {
+    position: relative;
+    height: 300px;
+    margin-bottom: 1rem;
+}
+
+/* Filters */
+.filter-section {
+    background: #fff;
+    border-radius: 10px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+/* Hierarchical Display */
+.hierarchy-container .card-header {
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.hierarchy-container .card-header:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
+.hierarchy-container .card-header[aria-expanded="true"] .bi-chevron-down {
+    transform: rotate(180deg);
+}
+
+.hierarchy-container .bi-chevron-down {
+    transition: transform 0.3s ease;
+}
+
+.hierarchy-container .supervisor-item {
+    transition: all 0.3s ease;
+}
+
+.hierarchy-container .supervisor-item:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateX(5px);
+}
+
+/* Tables */
+.table-actions {
+    white-space: nowrap;
+}
+
+.table-actions .btn {
+    padding: 0.25rem 0.5rem;
+    margin-right: 0.25rem;
+}
+
+.table-actions .btn:last-child {
+    margin-right: 0;
+}
+
+/* Location Management */
+.location-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.location-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.location-item:last-child {
+    border-bottom: none;
+}
+
+.location-item .btn-group {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.location-item:hover .btn-group {
+    opacity: 1;
+}
+
+/* Supervisor Management */
+.supervisor-card {
+    border-radius: 10px;
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.supervisor-card:hover {
+    transform: translateY(-2px);
+}
+
+.supervisor-stats {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #dee2e6;
+}
+
+.supervisor-stat {
+    text-align: center;
+}
+
+.supervisor-stat-value {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: var(--primary-color);
+}
+
+.supervisor-stat-label {
+    font-size: 0.875rem;
+    color: var(--secondary-color);
+}
+
+/* Performance Charts */
+.performance-chart {
+    height: 300px;
+    margin-bottom: 2rem;
+}
+
+/* Status Indicators */
+.status-active {
+    color: var(--success-color);
+}
+
+.status-inactive {
+    color: var(--danger-color);
+}
+
+/* Export Button */
+.export-btn {
+    position: relative;
+}
+
+.export-btn .spinner-border {
+    display: none;
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.export-btn.loading .spinner-border {
+    display: inline-block;
+}
+
+/* Modal Customizations */
+.modal-request-details {
+    max-width: 800px;
+}
+
+.modal-request-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+    .stats-card {
+        margin-bottom: 1rem;
+    }
+
+    .chart-container {
+        height: 250px;
+    }
+
+    .table-responsive {
+        margin-bottom: 1rem;
+    }
+
+    .location-list {
+        max-height: 300px;
+    }
+
+    .supervisor-card {
+        margin-bottom: 1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .stats-card .card-text {
+        font-size: 1.5rem;
+    }
+
+    .chart-container {
+        height: 200px;
+    }
+
+    .filter-section {
+        padding: 0.75rem;
+    }
+
+    .table-actions .btn {
+        padding: 0.25rem;
+    }
+
+    .supervisor-stats {
+        flex-wrap: wrap;
+    }
+
+    .supervisor-stat {
+        width: 50%;
+        margin-bottom: 1rem;
+    }
+}

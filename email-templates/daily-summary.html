@@ -1,0 +1,93 @@
+<div class="alert alert-info">
+    <h2>📊 Daily Summary Report</h2>
+    <p>Here's your daily summary of maintenance activities for {{reportDate}}.</p>
+</div>
+
+<!-- Summary Statistics -->
+<table class="details-table">
+    <tr>
+        <th colspan="2" style="background-color: #007bff; color: white; text-align: center;">
+            📈 Daily Statistics
+        </th>
+    </tr>
+    <tr>
+        <th>New Requests</th>
+        <td><strong>{{newRequests}}</strong></td>
+    </tr>
+    <tr>
+        <th>Resolved Requests</th>
+        <td><strong style="color: #28a745;">{{resolvedRequests}}</strong></td>
+    </tr>
+    <tr>
+        <th>Pending Requests</th>
+        <td><strong style="color: #ffc107;">{{pendingRequests}}</strong></td>
+    </tr>
+    <tr>
+        <th>Overdue Requests</th>
+        <td><strong style="color: #dc3545;">{{overdueRequests}}</strong></td>
+    </tr>
+    <tr>
+        <th>Active Supervisors</th>
+        <td><strong>{{activeSupervisors}}</strong></td>
+    </tr>
+    <tr>
+        <th>Avg Resolution Time</th>
+        <td>{{avgResolutionTime}} hours</td>
+    </tr>
+</table>
+
+<!-- Department Performance -->
+{{#if departmentStats}}
+<table class="details-table" style="margin-top: 20px;">
+    <tr>
+        <th colspan="3" style="background-color: #17a2b8; color: white; text-align: center;">
+            🏢 Department Performance
+        </th>
+    </tr>
+    <tr>
+        <th>Department</th>
+        <th>Requests Handled</th>
+        <th>Completion Rate</th>
+    </tr>
+    {{#each departmentStats}}
+    <tr>
+        <td>{{name}}</td>
+        <td>{{handled}}</td>
+        <td>{{completionRate}}%</td>
+    </tr>
+    {{/each}}
+</table>
+{{/if}}
+
+<!-- Top Issues -->
+{{#if topIssues}}
+<div class="alert alert-warning" style="margin-top: 20px;">
+    <strong>🔍 Most Common Issues Today:</strong>
+    <ul>
+        {{#each topIssues}}
+        <li>{{description}} ({{count}} occurrences)</li>
+        {{/each}}
+    </ul>
+</div>
+{{/if}}
+
+<!-- Alerts -->
+{{#if criticalAlerts}}
+<div class="alert alert-danger" style="margin-top: 20px;">
+    <strong>🚨 Critical Alerts:</strong>
+    <ul>
+        {{#each criticalAlerts}}
+        <li>{{message}}</li>
+        {{/each}}
+    </ul>
+</div>
+{{/if}}
+
+<div style="text-align: center; margin: 20px 0;">
+    <a href="{{dashboardUrl}}" class="btn">View Full Dashboard</a>
+</div>
+
+<div class="alert alert-success">
+    <strong>📅 Report Period:</strong> {{reportDate}}<br>
+    <strong>📧 Next Report:</strong> {{nextReportDate}}
+</div>

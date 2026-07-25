@@ -1,0 +1,1485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - RAMP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Custom table improvements */
+        .table th {
+            background-color: #f8f9fa;
+            border-top: none;
+            font-weight: 600;
+            white-space: nowrap;
+            padding: 12px 8px;
+        }
+        
+        .table td {
+            vertical-align: middle;
+            padding: 12px 8px;
+        }
+        
+        .table-responsive {
+            border-radius: 0.375rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        
+        /* Status badge improvements */
+        .badge {
+            font-size: 0.875rem;
+            padding: 0.5em 0.75em;
+            font-weight: 500;
+            border-radius: 0.375rem;
+        }
+        
+        /* Status-specific colors */
+        .bg-success {
+            background-color: #198754 !important;
+        }
+        
+        .bg-secondary {
+            background-color: #6c757d !important;
+        }
+        
+        .bg-danger {
+            background-color: #dc3545 !important;
+        }
+        
+        .bg-info {
+            background-color: #0dcaf0 !important;
+            color: #000 !important;
+        }
+        
+        /* Button improvements */
+        .btn-sm {
+            padding: 0.375rem 0.75rem;
+            font-size: 0.875rem;
+        }
+        
+        /* Improve text truncation */
+        .text-truncate {
+            max-width: 200px !important;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        
+        /* Status cards improvements */
+        .status-card {
+            transition: all 0.3s ease;
+            border-radius: 15px !important;
+        }
+        
+        .status-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15) !important;
+        }
+        
+        .status-card.active {
+            border: 3px solid #007bff !important;
+            transform: translateY(-3px);
+        }
+        
+        .status-card .card-body {
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .status-card .card-body::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            transition: all 0.5s;
+            opacity: 0;
+        }
+        
+        .status-card:hover .card-body::before {
+            animation: shine 1s ease-in-out;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); opacity: 0; }
+        }
+        
+        /* Card improvements */
+        .card {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            margin-bottom: 1.5rem;
+        }
+        
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            padding: 1rem 1.25rem;
+        }
+        
+        /* Filter section improvements */
+        .card-header .btn-link {
+            text-decoration: none;
+            color: #6c757d;
+        }
+        
+        .card-header .btn-link:hover {
+            color: #495057;
+        }
+        
+        .collapse .card-body {
+            background-color: #ffffff;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .table th, .table td {
+                padding: 8px 4px;
+                font-size: 0.875rem;
+            }
+            
+            .text-truncate {
+                max-width: 150px !important;
+            }
+        }
+
+        /* Safe Deletion Modal Styles */
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        
+        .step {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            margin: 0 5px;
+            border: 2px solid #e9ecef;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        
+        .step.completed {
+            background-color: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+        
+        .step.pending {
+            background-color: #e9ecef;
+            color: #6c757d;
+            border-color: #dee2e6;
+        }
+
+        .step-content {
+            min-height: 300px;
+        }
+
+        .assignment-card {
+            border-left: 4px solid #ffc107;
+            padding: 10px;
+            margin: 5px 0;
+            background: #fff;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/admin">RAMP Admin Dashboard</a>
+            <div class="navbar-nav ms-auto">
+                <span class="nav-item nav-link text-light" id="adminName">Admin User</span>
+                <button class="nav-link btn btn-link text-light" id="logoutBtn">
+                    <i class="bi bi-box-arrow-right"></i> Logout
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <!-- Alert Area -->
+        <div id="alertArea"></div>
+        
+        <!-- Loading Spinner -->
+        <div id="loadingSpinner" class="text-center d-none">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-2">Loading...</p>
+        </div>
+
+        <!-- Tab Navigation -->
+        <ul class="nav nav-tabs" id="adminTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="requests-tab" data-bs-toggle="tab" data-bs-target="#requests" type="button" role="tab">
+                    <i class="bi bi-list-check"></i> Requests
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="pending-tab" data-bs-toggle="tab" data-bs-target="#pending" type="button" role="tab">
+                    <i class="bi bi-exclamation-triangle"></i> Pending Assignments
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="supervisors-tab" data-bs-toggle="tab" data-bs-target="#supervisors" type="button" role="tab">
+                    <i class="bi bi-people"></i> Supervisors
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="locations-tab" data-bs-toggle="tab" data-bs-target="#locations" type="button" role="tab">
+                    <i class="bi bi-geo-alt"></i> Locations
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="analytics-tab" data-bs-toggle="tab" data-bs-target="#analytics" type="button" role="tab">
+                    <i class="bi bi-graph-up"></i> Analytics
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="ai-analytics-tab" data-bs-toggle="tab" data-bs-target="#ai-analytics" type="button" role="tab">
+                    <i class="bi bi-robot"></i> AI Advanced Analytics
+                </button>
+            </li>
+        </ul>
+        
+        <!-- Tab Content -->
+        <div class="tab-content mt-4" id="adminTabsContent">
+            <!-- Requests Tab -->
+            <div class="tab-pane fade show active" id="requests" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3>Maintenance Requests</h3>
+                    <button class="btn btn-outline-primary" onclick="loadRequests()">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    </button>
+                </div>
+                
+                <!-- Status Summary Cards -->
+                <div class="row mb-4" id="statusSummaryCards">
+                    <div class="col-md-2 mb-3">
+                        <div class="card border-0 shadow-sm h-100 status-card" onclick="filterByStatus('')" style="cursor: pointer;">
+                            <div class="card-body text-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                <i class="bi bi-list-ul display-4 text-white mb-2"></i>
+                                <h5 class="card-title text-white mb-1">Total</h5>
+                                <p class="card-text display-6 text-white mb-0 fw-bold" id="totalRequestsCount">-</p>
+                                <small class="text-white-50">All Requests</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <div class="card border-0 shadow-sm h-100 status-card" onclick="filterByStatus('Pending')" style="cursor: pointer;">
+                            <div class="card-body text-center bg-warning">
+                                <i class="bi bi-clock display-4 text-dark mb-2"></i>
+                                <h5 class="card-title text-dark mb-1">Pending</h5>
+                                <p class="card-text display-6 text-dark mb-0" id="pendingRequestsCount">-</p>
+                                <small class="text-dark">Awaiting Action</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <div class="card border-0 shadow-sm h-100 status-card" onclick="filterByStatus('Not Operable')" style="cursor: pointer;">
+                            <div class="card-body text-center bg-secondary">
+                                <i class="bi bi-x-circle display-4 text-white mb-2"></i>
+                                <h5 class="card-title text-white mb-1">Not Operable</h5>
+                                <p class="card-text display-6 text-white mb-0" id="notOperableRequestsCount">-</p>
+                                <small class="text-white-50">Cannot Process</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-2 mb-3">
+                        <div class="card border-0 shadow-sm h-100 status-card" onclick="filterByStatus('Resolved')" style="cursor: pointer;">
+                            <div class="card-body text-center bg-success">
+                                <i class="bi bi-check-circle display-4 text-white mb-2"></i>
+                                <h5 class="card-title text-white mb-1">Resolved</h5>
+                                <p class="card-text display-6 text-white mb-0" id="resolvedRequestsCount">-</p>
+                                <small class="text-white-50">Completed</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <div class="card border-0 shadow-sm h-100 status-card" onclick="filterByStatus('Forwarded to Other Department')" style="cursor: pointer;">
+                            <div class="card-body text-center bg-info">
+                                <i class="bi bi-arrow-right-circle display-4 text-white mb-2"></i>
+                                <h5 class="card-title text-white mb-1">Forwarded</h5>
+                                <p class="card-text display-6 text-white mb-0" id="forwardedRequestsCount">-</p>
+                                <small class="text-white-50">To Other Department</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Filters Panel -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-funnel"></i> Filters
+                            <button class="btn btn-link btn-sm float-end" type="button" data-bs-toggle="collapse" data-bs-target="#filtersCollapse" aria-expanded="false">
+                                <i class="bi bi-chevron-down"></i>
+                            </button>
+                        </h5>
+                    </div>
+                    <div class="collapse" id="filtersCollapse">
+                        <div class="card-body">
+                            <form id="requestFilters">
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        <label for="statusFilter" class="form-label">Status</label>
+                                        <select class="form-select" id="statusFilter" name="status">
+                                            <option value="">All Statuses</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="departmentFilter" class="form-label">Department</label>
+                                        <select class="form-select" id="departmentFilter" name="department_id">
+                                            <option value="">All Departments</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="divisionFilter" class="form-label">Division</label>
+                                        <select class="form-select" id="divisionFilter" name="division_id">
+                                            <option value="">All Divisions</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="cityFilter" class="form-label">City</label>
+                                        <select class="form-select" id="cityFilter" name="city_id">
+                                            <option value="">All Cities</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        <label for="dateFromFilter" class="form-label">From Date</label>
+                                        <input type="date" class="form-control" id="dateFromFilter" name="date_from">
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="dateToFilter" class="form-label">To Date</label>
+                                        <input type="date" class="form-control" id="dateToFilter" name="date_to">
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        <label for="searchFilter" class="form-label">Search</label>
+                                        <input type="text" class="form-control" id="searchFilter" name="search" placeholder="Search in description, location, name, employee ID...">
+                                    </div>
+                                    <div class="col-md-2 mb-3 d-flex align-items-end">
+                                        <button type="button" class="btn btn-primary me-2" onclick="applyFilters()">
+                                            <i class="bi bi-search"></i> Filter
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="clearFilters()">
+                                            <i class="bi bi-x-circle"></i> Clear
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Results Summary -->
+                <div id="requestsSummary" class="mb-3 d-none">
+                    <div class="alert alert-info mb-0">
+                        <i class="bi bi-info-circle"></i> 
+                        Showing <span id="requestsCount">0</span> requests 
+                        <span id="requestsTotal"></span>
+                    </div>
+                </div>
+                
+                <!-- Status Charts -->
+                <div id="statusCharts" class="mb-4 d-none">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="bi bi-bar-chart"></i> Status Breakdown - Bar Chart
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="statusBarChart" width="400" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h5 class="card-title mb-0">
+                                        <i class="bi bi-pie-chart"></i> Status Distribution - Pie Chart
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="statusPieChart" width="300" height="300"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="requestsContent">
+                    <p class="text-muted">Click "Filter" or load the tab to see requests...</p>
+                </div>
+            </div>
+            
+            <!-- Pending Assignments Tab -->
+            <div class="tab-pane fade" id="pending" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3>Pending Assignments</h3>
+                    <button class="btn btn-outline-primary" onclick="loadPendingAssignments()">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    </button>
+                </div>
+                
+                <!-- Pending Summary Cards -->
+                <div class="row mb-4" id="pendingSummary">
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-white bg-primary status-card" onclick="filterPendingByType('all')" style="cursor: pointer;">
+                            <div class="card-body text-center">
+                                <i class="bi bi-list-task display-6"></i>
+                                <h6 class="card-title mt-2">Total Pending</h6>
+                                <p class="card-text display-6" id="totalPendingCount">0</p>
+                                <small class="text-white-50">All Requests</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-white bg-warning status-card" onclick="filterPendingByType('unassigned')" style="cursor: pointer;">
+                            <div class="card-body text-center">
+                                <i class="bi bi-clock display-6 text-dark"></i>
+                                <h6 class="card-title mt-2 text-dark">Unassigned</h6>
+                                <p class="card-text display-6 text-dark" id="unassignedCount">0</p>
+                                <small class="text-dark">Need Assignment</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-white bg-info status-card" onclick="filterPendingByType('assigned')" style="cursor: pointer;">
+                            <div class="card-body text-center">
+                                <i class="bi bi-person-check display-6"></i>
+                                <h6 class="card-title mt-2">Assigned</h6>
+                                <p class="card-text display-6" id="assignedCount">0</p>
+                                <small class="text-white-50">Awaiting Acceptance</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="card text-white bg-secondary status-card" onclick="filterPendingByType('overdue')" style="cursor: pointer;">
+                            <div class="card-body text-center">
+                                <i class="bi bi-exclamation-triangle display-6"></i>
+                                <h6 class="card-title mt-2">Overdue</h6>
+                                <p class="card-text display-6" id="overdueCount">0</p>
+                                <small class="text-white-50">Over 24 Hours</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pending Filters Panel -->
+                <div class="card mb-3">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-funnel"></i> Pending Assignment Filters
+                            <button class="btn btn-link btn-sm float-end" type="button" data-bs-toggle="collapse" data-bs-target="#pendingFiltersCollapse" aria-expanded="false">
+                                <i class="bi bi-chevron-down"></i>
+                            </button>
+                        </h5>
+                    </div>
+                    <div class="collapse" id="pendingFiltersCollapse">
+                        <div class="card-body">
+                            <form id="pendingFilters">
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        <label for="pendingStatusFilter" class="form-label">Assignment Status</label>
+                                        <select class="form-select" id="pendingStatusFilter" name="assignment_status">
+                                            <option value="">All Types</option>
+                                            <option value="unassigned">Unassigned</option>
+                                            <option value="assigned">Assigned (Not Accepted)</option>
+                                            <option value="overdue">Overdue (>24hrs)</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="pendingDepartmentFilter" class="form-label">Department</label>
+                                        <select class="form-select" id="pendingDepartmentFilter" name="department_id">
+                                            <option value="">All Departments</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="pendingDivisionFilter" class="form-label">Division</label>
+                                        <select class="form-select" id="pendingDivisionFilter" name="division_id">
+                                            <option value="">All Divisions</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="pendingCityFilter" class="form-label">City</label>
+                                        <select class="form-select" id="pendingCityFilter" name="city_id">
+                                            <option value="">All Cities</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-3 mb-3">
+                                        <label for="pendingSupervisorFilter" class="form-label">Supervisor</label>
+                                        <select class="form-select" id="pendingSupervisorFilter" name="supervisor_id">
+                                            <option value="">All Supervisors</option>
+                                            <option value="null">Unassigned</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="pendingDateFromFilter" class="form-label">From Date</label>
+                                        <input type="date" class="form-control" id="pendingDateFromFilter" name="date_from">
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="pendingDateToFilter" class="form-label">To Date</label>
+                                        <input type="date" class="form-control" id="pendingDateToFilter" name="date_to">
+                                    </div>
+                                    <div class="col-md-3 mb-3">
+                                        <label for="pendingSortFilter" class="form-label">Sort By</label>
+                                        <select class="form-select" id="pendingSortFilter" name="sort">
+                                            <option value="created_at_desc">Newest First</option>
+                                            <option value="created_at_asc">Oldest First</option>
+                                            <option value="status_asc">Status (A-Z)</option>
+                                            <option value="location_asc">Location (A-Z)</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-8 mb-3">
+                                        <label for="pendingSearchFilter" class="form-label">Search</label>
+                                        <input type="text" class="form-control" id="pendingSearchFilter" name="search" placeholder="Search in description, location, requester name, employee ID...">
+                                    </div>
+                                    <div class="col-md-4 mb-3 d-flex align-items-end">
+                                        <button type="button" class="btn btn-primary me-2" onclick="applyPendingFilters()">
+                                            <i class="bi bi-search"></i> Filter
+                                        </button>
+                                        <button type="button" class="btn btn-outline-secondary" onclick="clearPendingFilters()">
+                                            <i class="bi bi-x-circle"></i> Clear
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Pending Results Summary -->
+                <div id="pendingResultsSummary" class="mb-3 d-none">
+                    <div class="alert alert-info mb-0">
+                        <i class="bi bi-info-circle"></i> 
+                        Showing <span id="pendingResultsCount">0</span> pending assignments
+                        <span id="pendingResultsTotal"></span>
+                        <span id="pendingActiveFilters" class="ms-2"></span>
+                    </div>
+                </div>
+                
+                <!-- Pending Content -->
+                <div id="pendingContent">
+                    <p class="text-muted">Loading pending assignments...</p>
+                </div>
+            </div>
+            
+            <!-- Supervisors Tab -->
+            <div class="tab-pane fade" id="supervisors" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3>Supervisors Management</h3>
+                    <div>
+                        <button class="btn btn-success me-2" onclick="showActiveSupervisors()">
+                            <i class="bi bi-check-circle"></i> Active Only
+                        </button>
+                        <button class="btn btn-secondary me-2" onclick="showAllSupervisors()">
+                            <i class="bi bi-people"></i> All
+                        </button>
+                        <button class="btn btn-primary me-2" id="addSupervisorBtn">
+                            <i class="bi bi-person-plus"></i> Add Supervisor
+                        </button>
+                        <button class="btn btn-outline-primary" onclick="loadSupervisors()">
+                            <i class="bi bi-arrow-clockwise"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="supervisorsContent">
+                    <p class="text-muted">Click this tab to load supervisors...</p>
+                </div>
+            </div>
+            
+            <!-- Locations Tab -->
+            <div class="tab-pane fade" id="locations" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3>Locations Management</h3>
+                    <div class="d-flex align-items-center gap-2">
+                        <small class="text-muted">
+                            <i class="bi bi-diagram-3 me-1"></i>
+                            Division → City → Colony → Buildings
+                        </small>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-success btn-sm" onclick="showAddLocationModal()">
+                                <i class="bi bi-plus-circle"></i> Add Location
+                            </button>
+                            <button class="btn btn-outline-primary btn-sm" onclick="loadLocations()">
+                                <i class="bi bi-arrow-clockwise"></i> Refresh
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="locationsContent">
+                    <p class="text-muted">Click this tab to load locations...</p>
+                </div>
+            </div>
+
+            <!-- Analytics Tab -->
+            <div class="tab-pane fade" id="analytics" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3>Performance Analytics & Insights</h3>
+                    <button class="btn btn-outline-primary" onclick="loadAnalytics()">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh Analytics
+                    </button>
+                </div>
+
+                <!-- Analytics Filters -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="bi bi-funnel"></i> Analytics Filters
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label class="form-label">Time Period</label>
+                                <select class="form-select" id="analyticsTimePeriod">
+                                    <option value="7">Last 7 Days</option>
+                                    <option value="30" selected>Last 30 Days</option>
+                                    <option value="90">Last 90 Days</option>
+                                    <option value="365">Last Year</option>
+                                    <option value="all">All Time</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Division</label>
+                                <select class="form-select" id="analyticsDivision">
+                                    <option value="">All Divisions</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">City</label>
+                                <select class="form-select" id="analyticsCity">
+                                    <option value="">All Cities</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Department</label>
+                                <select class="form-select" id="analyticsDepartment">
+                                    <option value="">All Departments</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-md-12">
+                                <button class="btn btn-primary" onclick="applyAnalyticsFilters()">
+                                    <i class="bi bi-search"></i> Apply Filters
+                                </button>
+                                <button class="btn btn-outline-secondary ms-2" onclick="clearAnalyticsFilters()">
+                                    <i class="bi bi-x-circle"></i> Clear Filters
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Content -->
+                <div id="analyticsContent">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i> Click "Apply Filters" to load analytics data.
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Advanced Analytics Tab -->
+            <div class="tab-pane fade" id="ai-analytics" role="tabpanel">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h3><i class="bi bi-robot"></i> AI Advanced Analytics</h3>
+                    <div class="badge bg-success">AI Powered</div>
+                </div>
+
+                <!-- AI Analytics Introduction -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h6 class="card-title"><i class="bi bi-lightbulb"></i> What is AI Advanced Analytics?</h6>
+                        <p class="card-text mb-3">
+                            Use natural language to generate custom analytics and insights from your RAMP data. 
+                            Simply describe what you want to analyze, and our AI will create tailored reports for you.
+                        </p>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="bi bi-chat-dots text-primary me-2"></i>
+                                    <span>Natural language queries</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="bi bi-graph-up text-success me-2"></i>
+                                    <span>Custom visualizations</span>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="d-flex align-items-center mb-2">
+                                    <i class="bi bi-clipboard-data text-info me-2"></i>
+                                    <span>Intelligent insights</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Query Interface -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="bi bi-magic"></i> AI Analytics Query
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="aiAnalyticsPrompt" class="form-label">
+                                <strong>Describe what you want to analyze:</strong>
+                            </label>
+                            <textarea 
+                                class="form-control" 
+                                id="aiAnalyticsPrompt" 
+                                rows="4" 
+                                placeholder="Example: Show me the trend of maintenance requests over the last 3 months by department, and identify which departments have the highest resolution rates..."
+                            ></textarea>
+                            <div class="form-text">Be specific about time periods, categories, and the type of analysis you need.</div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Analysis Type</label>
+                                <select class="form-select" id="aiAnalyticsType">
+                                    <option value="trend">Trend Analysis</option>
+                                    <option value="comparison">Comparative Analysis</option>
+                                    <option value="performance">Performance Analysis</option>
+                                    <option value="summary">Summary Report</option>
+                                    <option value="prediction">Predictive Insights</option>
+                                    <option value="custom">Custom Analysis</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Time Range</label>
+                                <select class="form-select" id="aiAnalyticsTimeRange">
+                                    <option value="7">Last 7 days</option>
+                                    <option value="30" selected>Last 30 days</option>
+                                    <option value="90">Last 3 months</option>
+                                    <option value="180">Last 6 months</option>
+                                    <option value="365">Last year</option>
+                                    <option value="all">All time</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-primary" onclick="generateAIAnalytics()" id="generateAnalyticsBtn">
+                                <i class="bi bi-magic"></i> Generate Analytics
+                            </button>
+                            <button class="btn btn-outline-secondary" onclick="clearAIAnalytics()">
+                                <i class="bi bi-x-circle"></i> Clear
+                            </button>
+                            <button class="btn btn-outline-info" onclick="showAnalyticsExamples()">
+                                <i class="bi bi-question-circle"></i> View Examples
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Example Queries -->
+                <div class="card mb-4" id="analyticsExamples" style="display: none;">
+                    <div class="card-header">
+                        <h6 class="mb-0">
+                            <i class="bi bi-lightbulb"></i> Example Queries
+                        </h6>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Performance Analysis:</h6>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">
+                                        <button class="btn btn-sm btn-outline-primary" onclick="setExampleQuery('performance1')">
+                                            Supervisor Performance Ranking
+                                        </button>
+                                    </li>
+                                    <li class="mb-2">
+                                        <button class="btn btn-sm btn-outline-primary" onclick="setExampleQuery('performance2')">
+                                            Department Efficiency Comparison
+                                        </button>
+                                    </li>
+                                    <li class="mb-2">
+                                        <button class="btn btn-sm btn-outline-primary" onclick="setExampleQuery('performance3')">
+                                            Request Resolution Time Analysis
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Trend Analysis:</h6>
+                                <ul class="list-unstyled">
+                                    <li class="mb-2">
+                                        <button class="btn btn-sm btn-outline-success" onclick="setExampleQuery('trend1')">
+                                            Monthly Request Volume Trends
+                                        </button>
+                                    </li>
+                                    <li class="mb-2">
+                                        <button class="btn btn-sm btn-outline-success" onclick="setExampleQuery('trend2')">
+                                            Seasonal Maintenance Patterns
+                                        </button>
+                                    </li>
+                                    <li class="mb-2">
+                                        <button class="btn btn-sm btn-outline-success" onclick="setExampleQuery('trend3')">
+                                            Geographic Distribution Analysis
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Analytics Results -->
+                <div class="card" id="aiAnalyticsResults" style="display: none;">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h6 class="mb-0">
+                            <i class="bi bi-graph-up"></i> Analysis Results
+                        </h6>
+                        <div>
+                            <button class="btn btn-sm btn-outline-primary" onclick="exportAIAnalytics()">
+                                <i class="bi bi-download"></i> Export
+                            </button>
+                            <button class="btn btn-sm btn-outline-success" onclick="saveAIAnalytics()">
+                                <i class="bi bi-bookmark"></i> Save
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="aiAnalyticsContent">
+                            <!-- AI-generated content will appear here -->
+                        </div>
+                        
+                        <!-- Loading indicator -->
+                        <div id="aiAnalyticsLoading" style="display: none;" class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Generating analytics...</span>
+                            </div>
+                            <p class="mt-3 text-muted">AI is analyzing your data and generating insights...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Supervisor Modal -->
+    <div class="modal fade" id="addSupervisorModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Supervisor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addSupervisorForm">
+                        <!-- Basic Information Section -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <h6 class="text-primary border-bottom pb-2 mb-3">
+                                    <i class="bi bi-person-badge"></i> Basic Information
+                                </h6>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="supervisorUsername" class="form-label">Username <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="supervisorUsername" name="username" required>
+                                <div class="form-text">This will be used for login</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="supervisorPassword" class="form-label">Password <span class="text-danger">*</span></label>
+                                <input type="password" class="form-control" id="supervisorPassword" name="password" required>
+                                <div class="form-text">Minimum 6 characters</div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="supervisorFullName" class="form-label">Full Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="supervisorFullName" name="full_name" required>
+                                <div class="form-text">Complete name for identification</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="supervisorEmployeeId" class="form-label">Employee ID</label>
+                                <input type="text" class="form-control" id="supervisorEmployeeId" name="employee_id">
+                                <div class="form-text">Official employee identification</div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="supervisorEmail" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="supervisorEmail" name="email">
+                                <div class="form-text">For notifications and communication</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="supervisorPhone" class="form-label">Phone Number <span class="text-danger">*</span></label>
+                                <input type="tel" class="form-control" id="supervisorPhone" name="phone" required>
+                                <div class="form-text">Primary contact number</div>
+                            </div>
+                        </div>
+
+                        <!-- Role & Access Section -->
+                        <div class="row mb-3 mt-4">
+                            <div class="col-12">
+                                <h6 class="text-primary border-bottom pb-2 mb-3">
+                                    <i class="bi bi-shield-check"></i> Role & Access Level
+                                </h6>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="supervisorRole" class="form-label">Role <span class="text-danger">*</span></label>
+                                <select class="form-control" id="supervisorRole" name="role" onchange="handleRoleChange()" required>
+                                    <option value="">Select Role</option>
+                                    <option value="supervisor">Supervisor</option>
+                                    <option value="admin_l1">Admin Level 1 (Global Access)</option>
+                                    <option value="admin_l2">Admin Level 2 (Division Access)</option>
+                                    <option value="admin_l3">Admin Level 3 (City Access)</option>
+                                </select>
+                                <div class="form-text">Choose the appropriate role based on responsibilities</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Supervisor Assignment Questions Section -->
+                        <div class="row mb-3 mt-4">
+                            <div class="col-12">
+                                <h6 class="text-primary border-bottom pb-2 mb-3">
+                                    <i class="bi bi-diagram-3"></i> Supervisor Assignment Location
+                                </h6>
+                                <div class="alert alert-info">
+                                    <i class="bi bi-info-circle me-2"></i>
+                                    <strong>Assignment Rule:</strong> Division → City → Colony → Department<br>
+                                    • One Colony can have multiple Departments<br>
+                                    • One Department can have only ONE Supervisor
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Step-by-Step Assignment Process -->
+                        <div class="row mb-3">
+                            <!-- Step 1: Division Selection -->
+                            <div class="col-md-3" id="divisionField" style="display: none;">
+                                <label for="supervisorDivision" class="form-label">
+                                    <span class="badge bg-primary me-2">1</span>
+                                    <i class="bi bi-building text-primary"></i> Division <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-control" id="supervisorDivision" name="division_id" onchange="loadCitiesForDivision()">
+                                    <option value="">Choose Division</option>
+                                </select>
+                                <div class="form-text">Which railway division?</div>
+                            </div>
+                            
+                            <!-- Step 2: City Selection -->
+                            <div class="col-md-3" id="cityField" style="display: none;">
+                                <label for="supervisorCity" class="form-label">
+                                    <span class="badge bg-info me-2">2</span>
+                                    <i class="bi bi-geo-alt text-info"></i> City <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-control" id="supervisorCity" name="city_id" onchange="loadColoniesForCity()">
+                                    <option value="">Choose City</option>
+                                </select>
+                                <div class="form-text">Which city in this division?</div>
+                            </div>
+                            
+                            <!-- Step 3: Colony Selection -->
+                            <div class="col-md-3" id="colonyField" style="display: none;">
+                                <label for="supervisorColony" class="form-label">
+                                    <span class="badge bg-success me-2">3</span>
+                                    <i class="bi bi-houses text-success"></i> Colony <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-control" id="supervisorColony" name="colony_id" onchange="loadDepartmentsForColony()">
+                                    <option value="">Choose Colony</option>
+                                </select>
+                                <div class="form-text">Which residential colony?</div>
+                            </div>
+                            
+                            <!-- Step 4: Department Selection -->
+                            <div class="col-md-3" id="departmentField" style="display: none;">
+                                <label for="supervisorDepartment" class="form-label">
+                                    <span class="badge bg-warning me-2">4</span>
+                                    <i class="bi bi-briefcase text-warning"></i> Department <span class="text-danger">*</span>
+                                </label>
+                                <select class="form-control" id="supervisorDepartment" name="department_id" onchange="checkDepartmentAvailability()">
+                                    <option value="">Choose Department</option>
+                                </select>
+                                <div class="form-text">Which department in this colony?</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Department Availability Status -->
+                        <div class="row mb-3" id="departmentStatusRow" style="display: none;">
+                            <div class="col-12">
+                                <div class="alert" id="departmentStatusAlert">
+                                    <i class="bi bi-clock me-2"></i>
+                                    Please complete the selection above to check department availability.
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Additional Information (Optional) -->
+                        <div class="row mb-3 mt-4">
+                            <div class="col-12">
+                                <h6 class="text-primary border-bottom pb-2 mb-3">
+                                    <i class="bi bi-info-circle"></i> Additional Information (Optional)
+                                </h6>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="supervisorSkills" class="form-label">Skills & Expertise</label>
+                                <textarea class="form-control" id="supervisorSkills" name="skills" rows="2" placeholder="Technical skills, certifications, expertise areas..."></textarea>
+                                <div class="form-text">Help in better task assignment</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="supervisorNotes" class="form-label">Additional Notes</label>
+                                <textarea class="form-control" id="supervisorNotes" name="notes" rows="2" placeholder="Any special requirements or notes..."></textarea>
+                                <div class="form-text">Special considerations for this supervisor</div>
+                            </div>
+                        </div>
+
+                        <!-- Workload & Availability Section -->
+                        <div class="row mb-3 mt-4">
+                            <div class="col-12">
+                                <h6 class="text-primary border-bottom pb-2 mb-3">
+                                    <i class="bi bi-calendar-week"></i> Workload & Availability
+                                </h6>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="supervisorMaxTasks" class="form-label">Maximum Concurrent Tasks</label>
+                                <input type="number" class="form-control" id="supervisorMaxTasks" name="max_concurrent_tasks" min="1" max="50" value="10">
+                                <div class="form-text">Maximum number of tasks this supervisor can handle simultaneously</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="supervisorWorkShift" class="form-label">Work Shift</label>
+                                <select class="form-control" id="supervisorWorkShift" name="work_shift">
+                                    <option value="day">Day Shift (8 AM - 6 PM)</option>
+                                    <option value="evening">Evening Shift (2 PM - 10 PM)</option>
+                                    <option value="night">Night Shift (10 PM - 6 AM)</option>
+                                    <option value="24x7">24/7 Availability</option>
+                                    <option value="flexible">Flexible Hours</option>
+                                </select>
+                                <div class="form-text">Primary working hours for task assignment</div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="supervisorPriority" class="form-label">Priority Level</label>
+                                <select class="form-control" id="supervisorPriority" name="priority_level">
+                                    <option value="high">High Priority (Emergency tasks)</option>
+                                    <option value="medium">Medium Priority (Standard tasks)</option>
+                                    <option value="low">Low Priority (Non-urgent tasks)</option>
+                                    <option value="all">All Priority Levels</option>
+                                </select>
+                                <div class="form-text">Types of priority tasks this supervisor should handle</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="supervisorExperience" class="form-label">Experience Level</label>
+                                <select class="form-control" id="supervisorExperience" name="experience_level">
+                                    <option value="trainee">Trainee (0-1 years)</option>
+                                    <option value="junior">Junior (1-3 years)</option>
+                                    <option value="senior">Senior (3-7 years)</option>
+                                    <option value="expert">Expert (7+ years)</option>
+                                    <option value="specialist">Specialist</option>
+                                </select>
+                                <div class="form-text">Experience level affects task complexity assignment</div>
+                            </div>
+                        </div>
+
+                        <!-- Emergency & Special Conditions -->
+                        <div class="row mb-3 mt-4">
+                            <div class="col-12">
+                                <h6 class="text-primary border-bottom pb-2 mb-3">
+                                    <i class="bi bi-exclamation-triangle"></i> Emergency & Special Conditions
+                                </h6>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="supervisorEmergency" name="emergency_response">
+                                    <label class="form-check-label" for="supervisorEmergency">
+                                        Available for Emergency Response
+                                    </label>
+                                </div>
+                                <div class="form-text">Can be contacted for urgent/emergency tasks outside normal hours</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="supervisorMobile" name="mobile_supervisor">
+                                    <label class="form-check-label" for="supervisorMobile">
+                                        Mobile Supervisor
+                                    </label>
+                                </div>
+                                <div class="form-text">Can travel between different locations</div>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-12 mb-3">
+                                <label for="supervisorNotes" class="form-label">Additional Notes</label>
+                                <textarea class="form-control" id="supervisorNotes" name="notes" rows="2" placeholder="Any special instructions, limitations, or additional information..."></textarea>
+                                <div class="form-text">Special considerations for task assignment</div>
+                            </div>
+                        </div>
+
+                        <!-- Auto-Assignment Preferences -->
+                        <div class="row mb-3 mt-4">
+                            <div class="col-12">
+                                <h6 class="text-primary border-bottom pb-2 mb-3">
+                                    <i class="bi bi-gear"></i> Auto-Assignment Preferences
+                                </h6>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="supervisorAutoAssign" name="auto_assign_enabled" checked>
+                                    <label class="form-check-label" for="supervisorAutoAssign">
+                                        Enable Auto-Assignment
+                                    </label>
+                                </div>
+                                <div class="form-text">Allow system to automatically assign tasks to this supervisor</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="supervisorAssignmentMethod" class="form-label">Assignment Method</label>
+                                <select class="form-control" id="supervisorAssignmentMethod" name="assignment_method">
+                                    <option value="balanced">Balanced Load</option>
+                                    <option value="expertise">Expertise Based</option>
+                                    <option value="location">Location Based</option>
+                                    <option value="priority">Priority Based</option>
+                                </select>
+                                <div class="form-text">How tasks should be assigned to this supervisor</div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveSupervisor()">
+                        <i class="bi bi-person-plus"></i> Add Supervisor
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Location Modal -->
+    <div class="modal fade" id="addLocationModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add New Location</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="addLocationForm">
+                        <div class="mb-3">
+                            <label for="locationType" class="form-label">Location Type</label>
+                            <select class="form-control" id="locationType" onchange="handleLocationTypeChange()">
+                                <option value="">Select Type</option>
+                                <option value="division">Division</option>
+                                <option value="city">City</option>
+                                <option value="colony">Colony</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3" id="locationNameField" style="display: none;">
+                            <label for="locationName" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="locationName" placeholder="Enter name">
+                        </div>
+
+                        <!-- Division Selection (for City) -->
+                        <div class="mb-3" id="parentDivisionField" style="display: none;">
+                            <label for="parentDivision" class="form-label">Division</label>
+                            <select class="form-control" id="parentDivision" onchange="loadCitiesForNewLocation()">
+                                <option value="">Select Division</option>
+                            </select>
+                        </div>
+
+                        <!-- City Selection (for Colony) -->
+                        <div class="mb-3" id="parentCityField" style="display: none;">
+                            <label for="parentCity" class="form-label">City</label>
+                            <select class="form-control" id="parentCity">
+                                <option value="">Select City</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" onclick="saveLocation()">Add Location</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Request Details Modal -->
+    <div class="modal fade" id="requestDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-file-text"></i> Request Details
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="requestDetailsContent">
+                    <!-- Request details will be populated here -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Assignment Modal -->
+    <div class="modal fade" id="assignmentModal" tabindex="-1" aria-labelledby="assignmentModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="assignmentModalLabel">
+                        <i class="bi bi-person-plus"></i> Assign Request
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="assignmentForm">
+                        <div class="mb-3">
+                            <label for="requestId" class="form-label">Request ID</label>
+                            <input type="text" class="form-control" id="requestId" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="supervisorSelect" class="form-label">Select Supervisor</label>
+                            <select class="form-control" id="supervisorSelect" required>
+                                <option value="">Choose a supervisor...</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="assignmentNotes" class="form-label">Assignment Notes (Optional)</label>
+                            <textarea class="form-control" id="assignmentNotes" rows="3" placeholder="Add any notes about this assignment..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmAssignment">
+                        <i class="bi bi-check"></i> Assign Request
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Safe Supervisor Deletion Modal -->
+    <div class="modal fade" id="safeDeletionModal" tabindex="-1" aria-labelledby="safeDeletionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="safeDeletionModalLabel">
+                        <i class="bi bi-shield-exclamation text-warning"></i> Safe Supervisor Deletion
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Step Indicator -->
+                    <div class="step-indicator mb-4">
+                        <div class="step active" id="step1">
+                            <i class="bi bi-1-circle"></i> Select
+                        </div>
+                        <div class="step pending" id="step2">
+                            <i class="bi bi-2-circle"></i> Safety Check
+                        </div>
+                        <div class="step pending" id="step3">
+                            <i class="bi bi-3-circle"></i> Transfer (if needed)
+                        </div>
+                        <div class="step pending" id="step4">
+                            <i class="bi bi-4-circle"></i> Confirm
+                        </div>
+                    </div>
+
+                    <!-- Content Area -->
+                    <div id="modalContent">
+                        <!-- Step 1: Supervisor Info -->
+                        <div id="modalStep1" class="step-content">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="bi bi-person-badge"></i> Supervisor Information</h6>
+                                </div>
+                                <div class="card-body" id="supervisorInfo">
+                                    <!-- Supervisor details will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Safety Check Results -->
+                        <div id="modalStep2" class="step-content" style="display: none;">
+                            <div id="modalSafetyResults">
+                                <!-- Safety check results will be populated here -->
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Assignment Transfer -->
+                        <div id="modalStep3" class="step-content" style="display: none;">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6><i class="bi bi-arrow-right-circle"></i> Transfer Assignments</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label for="modalTransferToSupervisor" class="form-label">Transfer all assignments to:</label>
+                                        <select class="form-control" id="modalTransferToSupervisor" required onchange="handleTransferSelectChange()">
+                                            <option value="">-- Select new supervisor --</option>
+                                            <option value="CREATE_NEW">+ Create New Supervisor</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <!-- Create New Supervisor Form (hidden by default) -->
+                                    <div id="createNewSupervisorForm" class="mb-3" style="display: none;">
+                                        <div class="alert alert-info">
+                                            <h6><i class="bi bi-person-plus"></i> Create New Supervisor</h6>
+                                            <p class="mb-3">Fill in the details below to create a new supervisor who will receive the transferred assignments.</p>
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <label for="newSupervisorUsername" class="form-label">Username *</label>
+                                                <input type="text" class="form-control" id="newSupervisorUsername" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label for="newSupervisorPassword" class="form-label">Password *</label>
+                                                <input type="password" class="form-control" id="newSupervisorPassword" required>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row mt-2">
+                                            <div class="col-md-4">
+                                                <label for="newSupervisorDivision" class="form-label">Division *</label>
+                                                <select class="form-control" id="newSupervisorDivision" required onchange="loadCitiesForNewSupervisor()">
+                                                    <option value="">-- Select Division --</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="newSupervisorCity" class="form-label">City *</label>
+                                                <select class="form-control" id="newSupervisorCity" required onchange="loadColoniesForNewSupervisor()">
+                                                    <option value="">-- Select City --</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <label for="newSupervisorColony" class="form-label">Colony</label>
+                                                <select class="form-control" id="newSupervisorColony">
+                                                    <option value="">-- Select Colony --</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="row mt-2">
+                                            <div class="col-md-6">
+                                                <label for="newSupervisorDepartment" class="form-label">Department *</label>
+                                                <select class="form-control" id="newSupervisorDepartment" required>
+                                                    <option value="">-- Select Department --</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6 d-flex align-items-end">
+                                                <button type="button" class="btn btn-success" onclick="createNewSupervisorAndTransfer()">
+                                                    <i class="bi bi-person-plus"></i> Create & Transfer
+                                                </button>
+                                                <button type="button" class="btn btn-outline-secondary ms-2" onclick="cancelNewSupervisorCreation()">
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div id="assignmentsList">
+                                        <!-- Assignment list will be populated here -->
+                                    </div>
+                                    
+                                    <!-- Transfer action buttons -->
+                                    <div class="mt-3 d-flex justify-content-end" id="transferActionButtons" style="display: none;">
+                                        <button type="button" class="btn btn-outline-secondary me-2" onclick="goBackToSafetyCheck()">
+                                            <i class="bi bi-arrow-left"></i> Back
+                                        </button>
+                                        <button type="button" class="btn btn-warning" onclick="modalTransferAssignments()">
+                                            <i class="bi bi-arrow-right"></i> Transfer to Selected Supervisor
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 4: Confirmation -->
+                        <div id="modalStep4" class="step-content" style="display: none;">
+                            <div class="card">
+                                <div class="card-header bg-danger text-white">
+                                    <h6><i class="bi bi-exclamation-triangle"></i> Final Confirmation</h6>
+                                </div>
+                                <div class="card-body" id="modalConfirmationContent">
+                                    <!-- Confirmation details will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="modalCheckSafetyBtn" onclick="modalCheckSafety()">
+                        <i class="bi bi-shield-check"></i> Check Safety
+                    </button>
+                    <button type="button" class="btn btn-warning" id="modalTransferBtn" onclick="showTransferStep()" style="display: none;">
+                        <i class="bi bi-arrow-right"></i> Transfer Assignments
+                    </button>
+                    <button type="button" class="btn btn-danger" id="modalDeleteBtn" onclick="modalConfirmDeletion()" style="display: none;">
+                        <i class="bi bi-trash"></i> Delete Supervisor
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../js/aiAssistant.js"></script>
+    <script src="js/working_admin.js"></script>
+</body>
+</html>

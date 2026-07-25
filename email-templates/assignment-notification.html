@@ -1,0 +1,62 @@
+<div class="alert alert-info">
+    <h2>👤 Request Assigned to Supervisor</h2>
+    <p>A maintenance request has been assigned to you for resolution.</p>
+</div>
+
+<table class="details-table">
+    <tr>
+        <th>Request ID</th>
+        <td><strong>#{{requestId}}</strong></td>
+    </tr>
+    <tr>
+        <th>Description</th>
+        <td>{{description}}</td>
+    </tr>
+    <tr>
+        <th>Location</th>
+        <td>{{location}}</td>
+    </tr>
+    <tr>
+        <th>Requested By</th>
+        <td>{{requesterName}} ({{employeeId}})</td>
+    </tr>
+    <tr>
+        <th>Mobile</th>
+        <td>{{mobile}}</td>
+    </tr>
+    <tr>
+        <th>Department</th>
+        <td>{{departmentName}}</td>
+    </tr>
+    <tr>
+        <th>Assigned By</th>
+        <td>{{assignedBy}}</td>
+    </tr>
+    <tr>
+        <th>Assignment Date</th>
+        <td>{{assignmentDate}}</td>
+    </tr>
+    <tr>
+        <th>Priority</th>
+        <td><span class="priority-{{priority}}">{{priorityText}}</span></td>
+    </tr>
+    <tr>
+        <th>Status</th>
+        <td><span class="status-badge status-assigned">Assigned</span></td>
+    </tr>
+</table>
+
+<div style="text-align: center; margin: 20px 0;">
+    <a href="{{supervisorDashboardUrl}}" class="btn">Accept Assignment</a>
+</div>
+
+<div class="alert alert-warning">
+    <strong>⚠️ Action Required:</strong> Please review this assignment and accept or reject it within 24 hours.
+</div>
+
+{{#if additionalNotes}}
+<div class="alert alert-info">
+    <strong>📝 Additional Notes:</strong><br>
+    {{additionalNotes}}
+</div>
+{{/if}}

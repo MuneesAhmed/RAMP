@@ -1,0 +1,41 @@
+🚨 RAMP - Unassigned Request Alert
+
+Dear Admin,
+
+⚠️ You have an unassigned maintenance request that needs supervisor allocation.
+
+Request Information:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🆔 Request ID: {{requestId}}
+📍 Location: {{location}}
+🏢 Division: {{divisionName}}
+🌆 City: {{cityName}}
+🔧 Department: {{departmentName}}
+👤 Requested By: {{name}} ({{designation}})
+📧 Contact Email: {{email}}
+📱 Contact Phone: {{mobile}}
+🆔 Employee ID: {{employeeId}}
+📝 Description: {{description}}
+⚡ Priority: {{priority}}
+📅 Submitted: {{submittedDate}}
+⏱️ Expected Completion: {{estimatedCompletion}}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎯 Action Required:
+This request requires immediate supervisor assignment to ensure timely completion.
+
+🔗 Admin Dashboard: {{adminDashboardUrl}}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+This alert was sent to you because:
+- This request falls under your administrative area
+- No supervisor has been assigned yet
+- Prompt action is needed to maintain service quality
+
+Best regards,
+RAMP Automated System
+
+This is an automated notification. Please check the admin dashboard for action.

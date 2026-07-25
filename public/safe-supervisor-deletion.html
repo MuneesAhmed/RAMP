@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Safe Supervisor Deletion</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.c            try {
+                const response = await fetch(`/api/admin/supervisor/${supervisorId}/deletion-safety`, {
+                    credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const result = await response.json(); rel="stylesheet">
+    <style>
+        .danger-zone {
+            border: 2px solid #dc3545;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        .assignment-card {
+            border-left: 4px solid #ffc107;
+            padding: 10px;
+            margin: 5px 0;
+            background: #fff;
+        }
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        .step {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 0 5px;
+        }
+        .step.active {
+            background-color: #007bff;
+            color: white;
+        }
+        .step.completed {
+            background-color: #28a745;
+            color: white;
+        }
+        .step.pending {
+            background-color: #e9ecef;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <div class="row">
+            <div class="col-12">
+                <h2>🔧 Safe Supervisor Deletion</h2>
+                <p class="text-muted">Safely remove supervisors while handling their assigned requests</p>
+                
+                <!-- Step Indicator -->
+                <div class="step-indicator">
+                    <div class="step active" id="step1">
+                        <strong>1. Select Supervisor</strong>
+                        <br><small>Choose supervisor to delete</small>
+                    </div>
+                    <div class="step pending" id="step2">
+                        <strong>2. Check Assignments</strong>
+                        <br><small>Review active assignments</small>
+                    </div>
+                    <div class="step pending" id="step3">
+                        <strong>3. Handle Assignments</strong>
+                        <br><small>Transfer or release assignments</small>
+                    </div>
+                    <div class="step pending" id="step4">
+                        <strong>4. Confirm Deletion</strong>
+                        <br><small>Final confirmation</small>
+                    </div>
+                </div>
+
+                <!-- Step 1: Select Supervisor -->
+                <div id="selectSupervisorSection">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5>🎯 Step 1: Select Supervisor to Delete</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="supervisorSelect" class="form-label">Choose Supervisor:</label>
+                                    <select class="form-select" id="supervisorSelect">
+                                        <option value="">-- Select a supervisor --</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">&nbsp;</label>
+                                    <button class="btn btn-primary d-block" onclick="checkSupervisor()">
+                                        🔍 Check Safety
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Safety Check Results -->
+                <div id="safetyCheckSection" style="display: none;">
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h5>🔍 Step 2: Safety Check Results</h5>
+                        </div>
+                        <div class="card-body" id="safetyCheckResults">
+                            <!-- Results will be populated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Handle Assignments -->
+                <div id="handleAssignmentsSection" style="display: none;">
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h5>📋 Step 3: Handle Active Assignments</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-warning">
+                                <strong>⚠️ Warning:</strong> This supervisor has active assignments that need to be handled before deletion.
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label for="transferToSupervisor" class="form-label">Transfer assignments to:</label>
+                                    <select class="form-select" id="transferToSupervisor">
+                                        <option value="">-- Select new supervisor --</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">&nbsp;</label>
+                                    <button class="btn btn-success d-block" onclick="transferAssignments()">
+                                        🔄 Transfer Assignments
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <hr>
+                            
+                            <div class="danger-zone">
+                                <h6>⚠️ Danger Zone</h6>
+                                <p>If no suitable supervisor is available, you can force delete and make assignments unassigned:</p>
+                                <button class="btn btn-danger" onclick="forceDelete()">
+                                    💥 Force Delete (Make Assignments Unassigned)
+                                </button>
+                            </div>
+                            
+                            <div id="assignmentsList">
+                                <!-- Assignment details will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Final Confirmation -->
+                <div id="confirmationSection" style="display: none;">
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h5>  Step 4: Final Confirmation</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-success">
+                                <strong>  Ready for deletion:</strong> All assignments have been handled safely.
+                            </div>
+                            <button class="btn btn-danger btn-lg" onclick="confirmDeletion()">
+                                🗑️ Delete Supervisor
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Modal -->
+    <div class="modal fade" id="loadingModal" tabindex="-1">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <div class="spinner-border" role="status"></div>
+                    <p class="mt-2">Processing...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let selectedSupervisor = null;
+        let safetyCheckResult = null;
+        let loadingModal = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+            
+            // Check for URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const supervisorId = urlParams.get('supervisorId');
+            const supervisorName = urlParams.get('supervisorName');
+            
+            if (supervisorId && supervisorName) {
+                console.log(`🎯 Auto-loading supervisor: ${supervisorName} (ID: ${supervisorId})`);
+                // Set the title to show which supervisor we're working with
+                document.querySelector('h1').innerHTML = `
+                    <i class="bi bi-shield-exclamation text-warning"></i>
+                    Safe Supervisor Deletion: ${decodeURIComponent(supervisorName)}
+                `;
+                
+                // Load supervisors and then auto-select the target supervisor
+                loadSupervisors().then(() => {
+                    autoSelectSupervisor(supervisorId, supervisorName);
+                });
+            } else {
+                loadSupervisors();
+            }
+        });
+
+        // Auto-select supervisor and run safety check
+        async function autoSelectSupervisor(supervisorId, supervisorName) {
+            const select = document.getElementById('supervisorSelect');
+            
+            // Find and select the supervisor
+            const option = Array.from(select.options).find(opt => opt.value == supervisorId);
+            if (option) {
+                select.value = supervisorId;
+                console.log(`  Auto-selected supervisor: ${supervisorName}`);
+                
+                // Automatically run the safety check
+                setTimeout(() => {
+                    checkSupervisor();
+                }, 500);
+            } else {
+                console.error(`❌ Supervisor ${supervisorName} (ID: ${supervisorId}) not found in dropdown`);
+                // Show error message
+                document.querySelector('.card-body').innerHTML = `
+                    <div class="alert alert-danger">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>Supervisor Not Found!</strong><br>
+                        The supervisor "${decodeURIComponent(supervisorName)}" (ID: ${supervisorId}) could not be found.<br>
+                        This might be because:
+                        <ul>
+                            <li>The supervisor has already been deleted</li>
+                            <li>You don't have permission to access this supervisor</li>
+                            <li>The supervisor ID is invalid</li>
+                        </ul>
+                        <button class="btn btn-primary mt-2" onclick="location.reload()">
+                            <i class="bi bi-arrow-clockwise"></i> Try Again
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadSupervisors() {
+            try {
+                const response = await fetch('/api/admin/supervisors', {
+                    credentials: 'same-origin',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('Supervisors data received:', data);
+                
+                const select = document.getElementById('supervisorSelect');
+                const transferSelect = document.getElementById('transferToSupervisor');
+                
+                // Clear existing options
+                select.innerHTML = '<option value="">-- Select a supervisor --</option>';
+                transferSelect.innerHTML = '<option value="">-- Select new supervisor --</option>';
+                
+                // Use the flat supervisors array if available
+                if (data.supervisors && Array.isArray(data.supervisors)) {
+                    data.supervisors.forEach(supervisor => {
+                        const locationInfo = [
+                            supervisor.division_name,
+                            supervisor.city_name,
+                            supervisor.colony_name
+                        ].filter(Boolean).join(' - ');
+                        
+                        const option = new Option(
+                            `${supervisor.username} (${locationInfo || 'No Location'})`,
+                            supervisor.id
+                        );
+                        select.add(option.cloneNode(true));
+                        transferSelect.add(option);
+                    });
+                } else if (data.hierarchy && Array.isArray(data.hierarchy)) {
+                    // Fallback to hierarchy structure
+                    data.hierarchy.forEach(division => {
+                        division.cities.forEach(city => {
+                            city.colonies.forEach(colony => {
+                                colony.supervisors.forEach(supervisor => {
+                                    const option = new Option(
+                                        `${supervisor.username} (${division.division_name} - ${city.city_name})`,
+                                        supervisor.id
+                                    );
+                                    select.add(option.cloneNode(true));
+                                    transferSelect.add(option);
+                                });
+                            });
+                        });
+                    });
+                } else {
+                    console.error('Unexpected data structure:', data);
+                    throw new Error('Invalid supervisors data structure');
+                }
+                
+            } catch (error) {
+                console.error('Error loading supervisors:', error);
+                alert('Failed to load supervisors');
+            }
+        }
+
+        async function checkSupervisor() {
+            const supervisorId = document.getElementById('supervisorSelect').value;
+            if (!supervisorId) {
+                alert('Please select a supervisor first');
+                return;
+            }
+
+            loadingModal.show();
+
+            try {
+                const response = await fetch(`/api/admin/supervisor/${supervisorId}/deletion-safety`);
+                const result = await response.json();
+                
+                selectedSupervisor = result.supervisor;
+                safetyCheckResult = result;
+                
+                displaySafetyResults(result);
+                updateStepIndicator(2);
+                
+            } catch (error) {
+                console.error('Error checking supervisor:', error);
+                
+                // Show detailed error message
+                const resultsDiv = document.getElementById('safetyCheckResults');
+                const safetySection = document.getElementById('safetyCheckSection');
+                
+                let errorMessage = 'Failed to check supervisor safety.';
+                let suggestion = '';
+                
+                if (error.message.includes('404')) {
+                    errorMessage = 'Supervisor not found.';
+                    suggestion = 'The supervisor may have already been deleted or you may not have permission to access it.';
+                } else if (error.message.includes('401')) {
+                    errorMessage = 'Authentication required.';
+                    suggestion = 'Please login to the admin dashboard first, then try again.';
+                } else if (error.message.includes('403')) {
+                    errorMessage = 'Access denied.';
+                    suggestion = 'You do not have permission to delete this supervisor.';
+                } else {
+                    suggestion = 'Please check your connection and try again. If the problem persists, contact support.';
+                }
+                
+                resultsDiv.innerHTML = `
+                    <div class="alert alert-danger">
+                        <h6><i class="bi bi-exclamation-triangle"></i> Error</h6>
+                        <p><strong>${errorMessage}</strong></p>
+                        <p><small>${suggestion}</small></p>
+                        <button class="btn btn-outline-primary btn-sm mt-2" onclick="location.reload()">
+                            <i class="bi bi-arrow-clockwise"></i> Try Again
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm mt-2 ms-2" onclick="window.close()">
+                            <i class="bi bi-x-circle"></i> Close
+                        </button>
+                    </div>
+                `;
+                
+                safetySection.style.display = 'block';
+                updateStepIndicator(2);
+            } finally {
+                loadingModal.hide();
+            }
+        }
+
+        function displaySafetyResults(result) {
+            const resultsDiv = document.getElementById('safetyCheckResults');
+            const safetySection = document.getElementById('safetyCheckSection');
+            
+            if (result.canDelete) {
+                resultsDiv.innerHTML = `
+                    <div class="alert alert-success">
+                        <h6>  Safe to Delete</h6>
+                        <p><strong>${result.supervisor.username}</strong> has no active assignments and can be safely deleted.</p>
+                    </div>
+                `;
+                document.getElementById('confirmationSection').style.display = 'block';
+                updateStepIndicator(4);
+            } else {
+                resultsDiv.innerHTML = `
+                    <div class="alert alert-warning">
+                        <h6>⚠️ Cannot Delete Safely</h6>
+                        <p><strong>${result.supervisor.username}</strong> has <strong>${result.activeAssignments}</strong> active assignments.</p>
+                        <p>You must handle these assignments before deletion.</p>
+                    </div>
+                `;
+                
+                displayAssignments(result.assignments);
+                document.getElementById('handleAssignmentsSection').style.display = 'block';
+                updateStepIndicator(3);
+            }
+            
+            safetySection.style.display = 'block';
+        }
+
+        function displayAssignments(assignments) {
+            const assignmentsList = document.getElementById('assignmentsList');
+            
+            let html = '<h6>Active Assignments:</h6>';
+            assignments.forEach(assignment => {
+                html += `
+                    <div class="assignment-card">
+                        <strong>Request ${assignment.maintenance_request_id}</strong>
+                        <br><small>${assignment.description}</small>
+                        <br><span class="badge bg-warning">Status: ${assignment.status}</span>
+                    </div>
+                `;
+            });
+            
+            assignmentsList.innerHTML = html;
+        }
+
+        async function transferAssignments() {
+            const toSupervisorId = document.getElementById('transferToSupervisor').value;
+            if (!toSupervisorId) {
+                alert('Please select a supervisor to transfer assignments to');
+                return;
+            }
+
+            loadingModal.show();
+
+            try {
+                const assignmentIds = safetyCheckResult.assignments.map(a => a.id);
+                
+                const response = await fetch('/api/admin/transfer-assignments', {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        fromSupervisorId: selectedSupervisor.id,
+                        toSupervisorId: toSupervisorId,
+                        assignmentIds: assignmentIds
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(`Successfully transferred ${result.transferredCount} assignments`);
+                    document.getElementById('handleAssignmentsSection').style.display = 'none';
+                    document.getElementById('confirmationSection').style.display = 'block';
+                    updateStepIndicator(4);
+                } else {
+                    alert('Failed to transfer assignments: ' + result.error);
+                }
+                
+            } catch (error) {
+                console.error('Error transferring assignments:', error);
+                alert('Failed to transfer assignments');
+            } finally {
+                loadingModal.hide();
+            }
+        }
+
+        async function forceDelete() {
+            if (!confirm(`⚠️ WARNING: This will make ${safetyCheckResult.activeAssignments} assignments unassigned. Continue?`)) {
+                return;
+            }
+
+            await deleteSupervisor(true);
+        }
+
+        async function confirmDeletion() {
+            if (!confirm(`Are you sure you want to delete supervisor ${selectedSupervisor.username}?`)) {
+                return;
+            }
+
+            await deleteSupervisor(false);
+        }
+
+        async function deleteSupervisor(forceDelete = false) {
+            loadingModal.show();
+
+            try {
+                const response = await fetch(`/api/admin/supervisor/${selectedSupervisor.id}/safe-delete`, {
+                    method: 'DELETE',
+                    credentials: 'same-origin',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({ forceDelete })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert(`Supervisor deleted successfully! ${result.orphanedAssignments > 0 ? `${result.orphanedAssignments} assignments became unassigned.` : ''}`);
+                    window.location.reload();
+                } else {
+                    alert('Failed to delete supervisor: ' + result.error);
+                }
+                
+            } catch (error) {
+                console.error('Error deleting supervisor:', error);
+                alert('Failed to delete supervisor');
+            } finally {
+                loadingModal.hide();
+            }
+        }
+
+        function updateStepIndicator(currentStep) {
+            for (let i = 1; i <= 4; i++) {
+                const step = document.getElementById(`step${i}`);
+                if (i < currentStep) {
+                    step.className = 'step completed';
+                } else if (i === currentStep) {
+                    step.className = 'step active';
+                } else {
+                    step.className = 'step pending';
+                }
+            }
+        }
+    </script>
+</body>
+</html>

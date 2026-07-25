@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Request - RAMP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">RAMP</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/track.html">Track Request</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login.html">Staff Login</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <h2 class="text-center mb-4">Track Your Maintenance Request</h2>
+
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-body">
+                        <ul class="nav nav-tabs" id="trackingTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="requestId-tab" data-bs-toggle="tab" 
+                                        data-bs-target="#requestId" type="button" role="tab">Track by Request ID</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="credentials-tab" data-bs-toggle="tab" 
+                                        data-bs-target="#credentials" type="button" role="tab">Track by Credentials</button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content mt-3" id="trackingTabsContent">
+                            <!-- Track by Request ID -->
+                            <div class="tab-pane fade show active" id="requestId" role="tabpanel">
+                                <form id="trackByIdForm">
+                                    <div class="mb-3">
+                                        <label for="requestIdInput" class="form-label">Request ID*</label>
+                                        <input type="text" class="form-control" id="requestIdInput" 
+                                               name="requestId" required>
+                                    </div>
+                                    <div class="text-center">
+                                        <button type="submit" class="btn btn-primary">Track Request</button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Track by Credentials -->
+                            <div class="tab-pane fade" id="credentials" role="tabpanel">
+                                <form id="trackByCredentialsForm">
+                                    <div class="mb-3">
+                                        <label for="emailInput" class="form-label">Email Address*</label>
+                                        <input type="email" class="form-control" id="emailInput" 
+                                               name="email" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="employeeIdInput" class="form-label">Employee ID/PF Number*</label>
+                                        <input type="text" class="form-control" id="employeeIdInput" 
+                                               name="employeeId" required>
+                                    </div>
+                                    <div id="credentialsError" class="mb-3" style="display: none;"></div>
+                                    <div class="text-center">
+                                        <button type="submit" class="btn btn-primary">Track Requests</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Request Details -->
+                <div id="requestDetails" class="mt-4 d-none">
+                    <div class="card">
+                        <div class="card-body">
+                            <div id="requestLoading" class="text-center d-none">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-2">Loading request details...</p>
+                            </div>
+                            <div id="requestNotFound" class="text-center d-none">
+                                <div class="alert alert-warning" role="alert">
+                                    No request found with the provided details.
+                                </div>
+                            </div>
+                            <div id="singleRequest" class="d-none">
+                                <h4 class="card-title mb-4">Request Details</h4>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <p><strong>Request ID:</strong> <span id="displayRequestId"></span></p>
+                                        <p><strong>Location:</strong> <span id="displayLocation"></span></p>
+                                        <p><strong>Department:</strong> <span id="displayDepartment"></span></p>
+                                        <p><strong>Description:</strong> <span id="displayDescription"></span></p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <p><strong>Status:</strong> <span id="displayStatus" class="badge"></span></p>
+                                        <p><strong>Submitted:</strong> <span id="displayCreatedAt"></span></p>
+                                        <p><strong>Last Updated:</strong> <span id="displayUpdatedAt"></span></p>
+                                    </div>
+                                </div>
+
+                                <!-- Status Timeline -->
+                                <div class="status-timeline mt-4">
+                                    <h5>Status History</h5>
+                                    <div id="statusHistory" class="timeline"></div>
+                                </div>
+                            </div>
+
+                            <!-- Multiple Requests Table -->
+                            <div id="multipleRequests" class="table-responsive d-none">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Request ID</th>
+                                            <th>Location</th>
+                                            <th>Department</th>
+                                            <th>Status</th>
+                                            <th>Submitted</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="requestTable"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/track.js"></script>
+</body>
+</html>

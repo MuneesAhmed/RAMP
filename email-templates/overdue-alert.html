@@ -1,0 +1,59 @@
+<div class="alert alert-danger">
+    <h2>⚠️ Overdue Request Alert</h2>
+    <p>The following maintenance request is overdue and requires immediate attention.</p>
+</div>
+
+<table class="details-table">
+    <tr>
+        <th>Request ID</th>
+        <td><strong>#{{requestId}}</strong></td>
+    </tr>
+    <tr>
+        <th>Description</th>
+        <td>{{description}}</td>
+    </tr>
+    <tr>
+        <th>Location</th>
+        <td>{{location}}</td>
+    </tr>
+    <tr>
+        <th>Submitted Date</th>
+        <td>{{submittedDate}}</td>
+    </tr>
+    <tr>
+        <th>Days Overdue</th>
+        <td><strong style="color: #dc3545;">{{daysOverdue}} days</strong></td>
+    </tr>
+    <tr>
+        <th>Priority</th>
+        <td><span class="priority-{{priority}}">{{priorityText}}</span></td>
+    </tr>
+    <tr>
+        <th>Current Status</th>
+        <td><span class="status-badge">{{currentStatus}}</span></td>
+    </tr>
+    {{#if supervisor}}
+    <tr>
+        <th>Assigned Supervisor</th>
+        <td>{{supervisor}}</td>
+    </tr>
+    {{/if}}
+    <tr>
+        <th>Requester</th>
+        <td>{{requesterName}} ({{mobile}})</td>
+    </tr>
+</table>
+
+<div class="alert alert-danger">
+    <strong>🚨 Immediate Action Required:</strong>
+    <ul>
+        <li>This request has been pending for {{daysOverdue}} days</li>
+        <li>Please prioritize this request for immediate resolution</li>
+        <li>Contact the requester if additional information is needed</li>
+        <li>Update the status to reflect current progress</li>
+    </ul>
+</div>
+
+<div style="text-align: center; margin: 20px 0;">
+    <a href="{{dashboardUrl}}" class="btn">Take Action Now</a>
+</div>
